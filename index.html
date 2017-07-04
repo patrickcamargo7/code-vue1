@@ -13,11 +13,22 @@
         .minha-classe{
             background-color: burlywood;
         }
+        .nenhuma-conta-pagar{
+        	color: green;
+        }
+        .contas-a-pagar{
+        	color: red;
+        }
+        .contas-nao-cadastradas{
+        	color: gray;
+        }
     </style>
 </head>
 <body id="app">
 <h1>{{ title }}</h1>
-<h3>{{ status }}</h3>
+<h3 :class="{'contas-nao-cadastradas': empty, 'contas-a-pagar': countDebts, 'nenhuma-conta-pagar': !countDebts}"">
+	{{ countDebts | generalStatus }}
+</h3>
 
 <nav>
     <ul>
@@ -48,7 +59,7 @@
             </td>
             <td>
                 <a href="#" @click.prevent="loadBill(bill)">Editar</a> |
-                <a href="#" @click.prevent="deleteBill(bill)">Excluir</a>
+                <a href="#" @click.prevent="deleteBill(index)">Excluir</a>
             </td>
         </tr>
         </tbody>

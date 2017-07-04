@@ -4,7 +4,17 @@ Vue.filter('doneLabel', function (value) {
     }
     return "Paga";
 });
-
+Vue.filter('generalStatus', function (value) {
+    if(value == -1){
+        return "Nenhuma conta cadastrada";
+    }
+    else if(value > 0){
+        return "Existem " + value + " contas a serem pagas";
+    }
+    else {
+        return "Nenhuma conta a pagar";
+    }
+});
 
 var app = new Vue({
     el: "#app",
@@ -14,6 +24,9 @@ var app = new Vue({
             { id: 0, name: "Listar contas"}, { id: 1, name: "Criar contas"}
         ],
         activedView: 0,
+        debts: false,
+        paids: false,
+        empty: true,
         formType: 'insert',
         title: "Contas a pagar",
         bill: {
@@ -32,25 +45,26 @@ var app = new Vue({
             'Gasolina'
         ],
         bills: [
-            {date_due: '20/08/2016', name: 'Conta de Luz', value: 70.99, done: 1},
-            {date_due: '21/08/2016', name: 'Conta de água', value: 55.99, done: 0},
-            {date_due: '22/08/2016', name: 'Conta de Telefone', value: 55.99, done: 0},
-            {date_due: '23/08/2016', name: 'Supermercado', value: 624.99, done: 0},
-            {date_due: '24/08/2016', name: 'Cartão de Crédito', value: 1500.99, done: 0},
-            {date_due: '25/08/2016', name: 'Empréstimo', value: 2000.99, done: 0},
-            {date_due: '26/08/2016', name: 'Gasolina', value: 200, done: 0}
         ]
     },
     computed: {
-        status: function(){
+        countDebts: function(){
+            this.debts = false;
+            this.empty = false;
+            if(!this.bills.length){
+                this.empty = true;
+                return -1;
+            }
             var count = 0;
             for(var i in this.bills){
                 if(!this.bills[i].done){
                     count++;
                 }
             }
-            return !count ? "Nenhuma conta a pagar" : "Existem " + count + " a serem pagas";
-        }
+            this.debts = count;
+            return count;
+        },
+
     },
     methods: {
         showView: function(id) {
@@ -70,7 +84,6 @@ var app = new Vue({
                 value: 0,
                 done: 0
             };
-
             this.activedView = 0;
         },
         loadBill: function(bill){
@@ -78,9 +91,9 @@ var app = new Vue({
             this.activedView = 1;
             this.formType = 'update';
         },
-        deleteBill: function (bill) {
+        deleteBill: function (index) {
             if(confirm('Deseja excluir esta conta?')) {
-                this.bills.$remove(bill);
+                this.bills.splice(index, 1);
             }
         }
     }
